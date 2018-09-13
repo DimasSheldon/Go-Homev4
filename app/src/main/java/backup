@@ -1,0 +1,700 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/cv"
+    android:layout_width="match_parent"
+    android:layout_height="68dp">
+
+    <android.support.v7.widget.CardView xmlns:card_view="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/card_view"
+        android:layout_width="match_parent"
+        android:layout_height="62dp"
+        android:layout_margin="10dp"
+        card_view:cardCornerRadius="4dp"
+        card_view:elevation="14dp">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <ImageView
+                android:id="@+id/widget_photo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentTop="true"
+                android:layout_marginRight="16dp" />
+
+            <TextView
+                android:id="@+id/widget_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:layout_toRightOf="@+id/widget_photo"
+                android:textSize="30sp" />
+
+            <TextView
+                android:id="@+id/widget_status"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/widget_name"
+                android:layout_toRightOf="@+id/widget_photo" />
+
+        </RelativeLayout>
+    </android.support.v7.widget.CardView>
+
+</RelativeLayout>
+
+
+....activity_main.xml
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".activities.MainActivity">
+
+    <!-- Use DrawerLayout as root container for activity -->
+    <android.support.v4.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/drawer_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fitsSystemWindows="true">
+
+        <FrameLayout
+            android:id="@+id/content_frame"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+
+        <!-- Container for contents of drawer - use NavigationView to make configuration easier -->
+        <android.support.design.widget.NavigationView
+            android:id="@+id/nav_view"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="start"
+            android:fitsSystemWindows="true"
+            app:menu="@menu/drawer_view" />
+f
+    </android.support.v4.widget.DrawerLayout>
+
+    <android.support.design.widget.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
+
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="?attr/colorPrimary"
+            app:layout_scrollFlags="scroll|enterAlways"
+            app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
+
+        <android.support.design.widget.TabLayout
+            android:id="@+id/tabs"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:tabGravity="fill"
+            app:tabMode="fixed" />
+    </android.support.design.widget.AppBarLayout>
+
+
+    <android.support.v4.view.ViewPager
+        android:id="@+id/viewpager"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+</android.support.design.widget.CoordinatorLayout>
+
+
+Monitor Fragment xml
+
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:showIn="@layout/activity_main">
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/rv_monitor"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:clipToPadding="false"
+        android:scrollbars="vertical" />
+
+</RelativeLayout>
+
+
+package sheldon.com.android.gohome.fragments;
+
+import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import sheldon.com.android.gohome.R;
+import sheldon.com.android.gohome.adapters.ControlAdapter;
+import sheldon.com.android.gohome.content.WidgetControl;
+
+public class ControlFragment extends Fragment {
+    private List<WidgetControl> widgets;
+    private RecyclerView rv;
+
+    public ControlFragment() {
+        // Required empty public constructor
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        // Inflate the layout for this fragment
+        View rootView = inflater.inflate(R.layout.fragment_control, container, false);
+
+        rv = (RecyclerView) rootView.findViewById(R.id.rv_control);
+        rv.setHasFixedSize(true);
+
+        initializeData();
+        initializeAdapter();
+
+        LinearLayoutManager llm = new LinearLayoutManager(getActivity());
+        rv.setLayoutManager(llm);
+
+        return rootView;
+    }
+
+    private void initializeData() {
+        widgets = new ArrayList<>();
+        widgets.add(new WidgetControl("Kontrol-1", "OFF", 0));
+        widgets.add(new WidgetControl("Kontrol-2", "OFF", 0));
+    }
+
+    private void initializeAdapter() {
+        ControlAdapter adapter = new ControlAdapter(widgets);
+        rv.setAdapter(adapter);
+    }
+}
+
+package sheldon.com.android.gohome.adapters;
+
+import android.support.v7.widget.CardView;
+import android.support.v7.widget.RecyclerView;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Switch;
+import android.widget.TextView;
+
+import java.util.List;
+
+import sheldon.com.android.gohome.R;
+import sheldon.com.android.gohome.content.WidgetControl;
+
+public class ControlAdapter extends RecyclerView.Adapter<ControlAdapter.WidgetViewHolder> {
+
+    public static class WidgetViewHolder extends RecyclerView.ViewHolder {
+
+        CardView cv;
+        TextView widgetName;
+        TextView widgetStatus;
+        Switch widgetToggleStat;
+
+        public WidgetViewHolder(View itemView) {
+            super(itemView);
+            cv = (CardView) itemView.findViewById(R.id.cv_control);
+            widgetName = (TextView) itemView.findViewById(R.id.widget_name_control);
+            widgetStatus = (TextView) itemView.findViewById(R.id.widget_status_control);
+            widgetToggleStat = (Switch) itemView.findViewById(R.id.switch_toggle);
+        }
+    }
+
+    List<WidgetControl> widgets;
+
+    public ControlAdapter(List<WidgetControl> widgets) {
+        this.widgets = widgets;
+    }
+
+    @Override
+    public void onAttachedToRecyclerView(RecyclerView recyclerView) {
+        super.onAttachedToRecyclerView(recyclerView);
+    }
+
+    @Override
+    public WidgetViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
+        View v = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.card_control, viewGroup, false);
+        WidgetViewHolder wvh = new WidgetViewHolder(v);
+        return wvh;
+    }
+
+    @Override
+    public void onBindViewHolder(final WidgetViewHolder widgetViewHolder, int i) {
+        widgetViewHolder.widgetName.setText(widgets.get(i).getName());
+        widgetViewHolder.widgetStatus.setText(widgets.get(i).getValue());
+        widgetViewHolder.widgetToggleStat.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+            }
+        });
+    }
+
+    @Override
+    public int getItemCount() {
+        return widgets.size();
+    }
+}
+
+
+public static void updateData(JSONObject jsonObject) {
+        widgets.clear();
+
+        mfLabels.clear();
+        mfValues.clear();
+        icons.clear();
+        mfIcons.clear();
+        colors.clear();
+        mfColors.clear();
+        mfIconColors.clear();
+
+        assignAttributes("AI", jsonObject);
+        assignAttributes("DI", jsonObject);
+
+        for (String icon : icons) {
+            switch (icon) {
+                case "ion ion-thermometer":
+                    mfIcons.add(R.mipmap.ic_temperature_foreground);
+                    break;
+                case "ion ion-android-alert":
+//                    mfIcons.add(R.drawable.logo_white);
+                    break;
+                case "ion ion-ios-lightbulb":
+                    mfIcons.add(R.mipmap.ic_light_bulb_white_foreground);
+                    break;
+                case "ion ion-waterdrop":
+                    mfIcons.add(R.mipmap.ic_humidity_foreground);
+                    break;
+                default:
+                    mfIcons.add(R.drawable.logo_white);
+                    break;
+            }
+        }
+
+        for (String color : colors) {
+            switch (color) {
+                case "bg-red":
+                    mfColors.add(Color.parseColor("#d32f2f"));
+                    mfIconColors.add(Color.parseColor("#9a0007"));
+                    break;
+                case "bg-blue":
+                    mfColors.add(Color.parseColor("#1565c0"));
+                    mfIconColors.add(Color.parseColor("#003c8f"));
+                    break;
+                case "bg-orange":
+                    mfColors.add(Color.parseColor("#ff8f00"));
+                    mfIconColors.add(Color.parseColor("#c56000"));
+                    break;
+                default:
+                    mfColors.add(Color.GRAY);
+                    mfIconColors.add(Color.DKGRAY);
+                    break;
+            }
+        }
+
+        initializeData(mfLabels, mfValues, mfIcons, mfColors, mfIconColors);
+
+        initializeAdapterLLM();
+    }
+
+    private static void assignAttributes(String key, JSONObject jsonObject) {
+        for (int i = 0; i < jsonObject.length(); i++) {
+
+            try {
+                JSONObject attribute = jsonObject.getJSONObject(String.valueOf(i));
+
+                if (attribute.names().toString().contains(key)) {
+                    mfLabels.add(attribute.getString("label" + key));
+                    mfValues.add(attribute.getString("value" + key));
+                    icons.add(attribute.getString("icon" + key));
+                    colors.add(attribute.getString("color" + key));
+                }
+                monitorAdapter.notifyDataSetChanged();
+
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+        }
+    }
+
+    private static void initializeData(ArrayList<String> labels,
+                                       ArrayList<String> status,
+                                       ArrayList<Integer> icons,
+                                       ArrayList<Integer> cvColors,
+                                       ArrayList<Integer> iconColors) {
+
+        for (int i = 0; i < labels.size(); i++) {
+            widgets.add(i, new WidgetMonitor(labels.get(i), status.get(i), icons.get(i),
+                    cvColors.get(i), iconColors.get(i)));
+            monitorAdapter.notifyItemChanged(i);
+        }
+    }
+
+    private static void initializeAdapterLLM() {
+        monitorAdapter = new MonitorAdapter(widgets);
+        rv.setAdapter(monitorAdapter);
+    }
+
+    private static void initiateEmptyWidgets() {
+        for (int i = 1; i <= 5; i++)
+            widgets.add(new WidgetMonitor("Monitoring " + String.valueOf(i), "NA", R.drawable.logo_white, Color.GRAY, Color.DKGRAY));
+        initializeAdapterLLM();
+    }
+
+     try {
+                        if (response.get(key) instanceof JSONObject) {
+                            // set data for Analog Input and Digital Input
+                            if (key.contains("AI") || key.contains("DI")) {
+                                JSONObject currData = new JSONObject(response.get(key).toString());
+
+                                if (currData.getString("status").equals("ACTIVE")) {
+                                    countUpdate++;
+                                    MonitorFragment.updateData(currData);
+                                }
+                            } else {
+                                MonitorFragment.removeUnusedWidgets();
+                                MonitorFragment.resetPosition();
+                                countUpdate = 0;
+                            }
+
+                            // set data for Digital Output
+                            if (key.contains("DO")) {
+
+                                JSONObject currData = new JSONObject(response.get(key).toString());
+
+                                if (currData.getString("status").equals("ACTIVE")) {
+                                    countUpdate++;
+                                    ControlFragment.updateData(currData);
+                                }
+                            } else {
+                                ControlFragment.resetPosition();
+                                countUpdate = 0;
+                            }
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+
+
+                    <?xml version="1.0" encoding="utf-8"?>
+                    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                        xmlns:app="http://schemas.android.com/apk/res-auto"
+                        xmlns:tools="http://schemas.android.com/tools"
+                        android:id="@+id/fragment_monitor"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+                        tools:showIn="@layout/activity_main">
+
+                        <android.support.v7.widget.RecyclerView
+                            android:id="@+id/rv_monitor"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:clipToPadding="false"
+                            android:scrollbars="vertical" />
+
+                    </RelativeLayout>
+
+private static Map<String, String> colorMap = new HashMap<String, String>() {
+        {
+            put("aliceblue", "#f0f8ff");
+            put("antiquewhite", "#faebd7");
+            put("aqua", "#00ffff");
+            put("aquamarine", "#7fffd4");
+            put("azure", "#f0ffff");
+            put("beige", "#f5f5dc");
+            put("bisque", "#ffe4c4");
+            put("black", "#000000");
+            put("blanchedalmond", "#ffebcd");
+            put("blue", "#0000ff");
+            put("blueviolet", "#8a2be2");
+            put("brown", "#a52a2a");
+            put("burlywood", "#deb887");
+            put("cadetblue", "#5f9ea0");
+            put("chartreuse", "#7fff00");
+            put("chocolate", "#d2691e");
+            put("coral", "#ff7f50");
+            put("cornflowerblue", "#6495ed");
+            put("cornsilk", "#fff8dc");
+            put("crimson", "#dc143c");
+            put("cyan", "#00ffff");
+            put("darkblue", "#00008b");
+            put("darkcyan", "#008b8b");
+            put("darkgoldenrod", "#b8860b");
+            put("darkgray", "#a9a9a9");
+            put("darkgreen", "#006400");
+            put("darkkhaki", "#bdb76b");
+            put("darkmagenta", "#8b008b");
+            put("darkolivegreen", "#556b2f");
+            put("darkorange", "#ff8c00");
+            put("darkorchid", "#9932cc");
+            put("darkred", "#8b0000");
+            put("darksalmon", "#e9967a");
+            put("darkseagreen", "#8fbc8f");
+            put("darkslateblue", "#483d8b");
+            put("darkslategray", "#2f4f4f");
+            put("darkturquoise", "#00ced1");
+            put("darkviolet", "#9400d3");
+            put("deeppink", "#ff1493");
+            put("deepskyblue", "#00bfff");
+            put("dimgray", "#696969");
+            put("dodgerblue", "#1e90ff");
+            put("firebrick", "#b22222");
+            put("floralwhite", "#fffaf0");
+            put("forestgreen", "#228b22");
+            put("fuchsia", "#ff00ff");
+            put("gainsboro", "#dcdcdc");
+            put("ghostwhite", "#f8f8ff");
+            put("gold", "#ffd700");
+            put("goldenrod", "#daa520");
+            put("gray", "#808080");
+            put("green", "#008000");
+            put("greenyellow", "#adff2f");
+            put("honeydew", "#f0fff0");
+            put("hotpink", "#ff69b4");
+            put("indianred ", "#cd5c5c");
+            put("indigo ", "#4b0082");
+            put("ivory", "#fffff0");
+            put("khaki", "#f0e68c");
+            put("lavender", "#e6e6fa");
+            put("lavenderblush", "#fff0f5");
+            put("lawngreen", "#7cfc00");
+            put("lemonchiffon", "#fffacd");
+            put("lightblue", "#add8e6");
+            put("lightcoral", "#f08080");
+            put("lightcyan", "#e0ffff");
+            put("lightgoldenrodyellow", "#fafad2");
+            put("lightgrey", "#d3d3d3");
+            put("lightgreen", "#90ee90");
+            put("lightpink", "#ffb6c1");
+            put("lightsalmon", "#ffa07a");
+            put("lightseagreen", "#20b2aa");
+            put("lightskyblue", "#87cefa");
+            put("lightslategray", "#778899");
+            put("lightsteelblue", "#b0c4de");
+            put("lightyellow", "#ffffe0");
+            put("lime", "#00ff00");
+            put("limegreen", "#32cd32");
+            put("linen", "#faf0e6");
+            put("magenta", "#ff00ff");
+            put("maroon", "#800000");
+            put("mediumaquamarine", "#66cdaa");
+            put("mediumblue", "#0000cd");
+            put("mediumorchid", "#ba55d3");
+            put("mediumpurple", "#9370d8");
+            put("mediumseagreen", "#3cb371");
+            put("mediumslateblue", "#7b68ee");
+            put("mediumspringgreen", "#00fa9a");
+            put("mediumturquoise", "#48d1cc");
+            put("mediumvioletred", "#c71585");
+            put("midnightblue", "#191970");
+            put("mintcream", "#f5fffa");
+            put("mistyrose", "#ffe4e1");
+            put("moccasin", "#ffe4b5");
+            put("navajowhite", "#ffdead");
+            put("navy", "#000080");
+            put("oldlace", "#fdf5e6");
+            put("olive", "#808000");
+            put("olivedrab", "#6b8e23");
+            put("orange", "#ffa500");
+            put("orangered", "#ff4500");
+            put("orchid", "#da70d6");
+            put("palegoldenrod", "#eee8aa");
+            put("palegreen", "#98fb98");
+            put("paleturquoise", "#afeeee");
+            put("palevioletred", "#d87093");
+            put("papayawhip", "#ffefd5");
+            put("peachpuff", "#ffdab9");
+            put("peru", "#cd853f");
+            put("pink", "#ffc0cb");
+            put("plum", "#dda0dd");
+            put("powderblue", "#b0e0e6");
+            put("purple", "#800080");
+            put("red", "#ff0000");
+            put("rosybrown", "#bc8f8f");
+            put("royalblue", "#4169e1");
+            put("saddlebrown", "#8b4513");
+            put("salmon", "#fa8072");
+            put("sandybrown", "#f4a460");
+            put("seagreen", "#2e8b57");
+            put("seashell", "#fff5ee");
+            put("sienna", "#a0522d");
+            put("silver", "#c0c0c0");
+            put("skyblue", "#87ceeb");
+            put("slateblue", "#6a5acd");
+            put("slategray", "#708090");
+            put("snow", "#fffafa");
+            put("springgreen", "#00ff7f");
+            put("steelblue", "#4682b4");
+            put("tan", "#d2b48c");
+            put("teal", "#008080");
+            put("thistle", "#d8bfd8");
+            put("tomato", "#ff6347");
+            put("turquoise", "#40e0d0");
+            put("violet", "#ee82ee");
+            put("wheat", "#f5deb3");
+            put("white", "#ffffff");
+            put("whitesmoke", "#f5f5f5");
+            put("yellow", "#ffff00");
+            put("yellowgreen", "#9acd32");
+        }
+    };
+
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+
+    package sheldon.com.android.gohomev2.asynctask;
+
+    import android.app.ProgressDialog;
+    import android.content.Context;
+    import android.util.Log;
+
+    import org.json.*;
+
+    import com.loopj.android.http.*;
+
+    import cz.msebera.android.httpclient.Header;
+    import sheldon.com.android.gohomev2.R;
+
+    public class LoopJ {
+        private static final String TAG = "LOOPJ";
+        private static final String AUTH_URL = "user/submitLogin/";
+        private static final String SYNC_URL = "device/getListSensor/";
+
+        private Context context;
+        private LoopJListener loopJListener;
+        private String authStatus;
+
+        public static String uname, fullName, email, role, token, auth;
+        public static JSONObject syncResponse;
+        public static boolean isBusy;
+
+        public LoopJ(LoopJListener loopJListener) {
+            this.loopJListener = loopJListener;
+        }
+
+        public LoopJ(Context context, LoopJListener loopJListener) {
+            this.context = context;
+            this.loopJListener = loopJListener;
+        }
+
+        public void sendLoginRequest(String username, String hashPassword) {
+            RequestParams requestParams = new RequestParams();
+            requestParams.put("username", username);
+            requestParams.put("hashpassword", hashPassword);
+
+            LoopJRestClient.post(AUTH_URL, requestParams, new JsonHttpResponseHandler() {
+                ProgressDialog progressDialog;
+
+                @Override
+                public void onStart() {
+                    progressDialog = new ProgressDialog(context,
+                            R.style.AppTheme_Dark_Dialog);
+
+                    progressDialog.setMessage("Authenticating...");
+                    progressDialog.setIndeterminate(false);
+                    progressDialog.setCanceledOnTouchOutside(false);
+                    progressDialog.setCancelable(false);
+                    progressDialog.show();
+                }
+
+                @Override
+                public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
+                    Log.d(TAG, "onFailure#1: " + errorResponse);
+                    authStatus = errorResponse.toString();
+                }
+
+                @Override
+                public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                    Log.d(TAG, "onFailure#2: " + responseString);
+                    authStatus = responseString;
+                }
+
+
+                @Override
+                public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                    Log.d(TAG, "onSuccess: " + response);
+                    try {
+                        auth = response.getString("logStat");
+                        authStatus = auth;
+
+                        uname = response.getString("username");
+                        fullName = response.getString("full_name");
+                        email = response.getString("email");
+                        role = response.getString("role");
+                        token = response.getString("token");
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    loopJListener.authenticate(authStatus);
+                }
+
+                @Override
+                public void onFinish() {
+                    //Do something with the response
+                    progressDialog.dismiss();
+                }
+            });
+        }
+
+        public void synchronize(String token, String username) {
+    //        Log.d("USERNAME", "synchronize: " + username);
+    //        Log.d("TOKEN", "synchronize: " + token);
+
+            LoopJRestClient.addHeader("username", username);
+            LoopJRestClient.addHeader("tokenid", token);
+
+            LoopJRestClient.get(SYNC_URL, null, new JsonHttpResponseHandler() {
+                @Override
+                public void onStart() {
+                    isBusy = true;
+                }
+
+                @Override
+                public void onFailure(int statusCode, Header[] headers, Throwable throwable,
+                                      JSONObject errorResponse) {
+                    Log.d(TAG, "onFailure#1: " + errorResponse);
+                }
+
+                @Override
+                public void onFailure(int statusCode, Header[] headers, String responseString,
+                                      Throwable throwable) {
+                    Log.d(TAG, "onFailure#2: " + responseString);
+                }
+
+                @Override
+                public void onSuccess(int statusCode, Header[] headers,
+                                      JSONObject response) {
+                    syncResponse = response;
+                }
+
+                @Override
+                public void onFinish() {
+                    isBusy = false;
+                }
+            });
+        }
+    }
